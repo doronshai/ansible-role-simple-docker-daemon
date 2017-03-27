@@ -35,7 +35,7 @@
     groups: "{{ docker_group }}"
     append: yes
   with_items: "{{ docker_group_members }}"
-  when: docker_group_members not none
+  when:  docker_group_members != ""
 
 - name: "start docker service"
   service:
@@ -44,8 +44,11 @@
     enabled: yes
   register: service
 
-- name: wait until docker service is up
+- name: "wait until docker service is up"
   wait_for:
     path: /var/run/docker.sock
     delay: 10
   when: (service|changed)
+
+- name: Kill own ssh connections
+  ssh-reconnect: all=True
