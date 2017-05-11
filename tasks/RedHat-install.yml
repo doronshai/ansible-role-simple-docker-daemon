@@ -1,25 +1,49 @@
 ---
-- rpm_key:
-    state: present
-    key: https://yum.dockerproject.org/gpg
-    validate_certs: false
+- block:
+  - rpm_key:
+      state: present
+      key: https://yum.dockerproject.org/gpg
+      validate_certs: false
 
-- name: "set docker daemon options"
-  template:
-    src: docker.repo.j2
-    dest: /etc/yum.repos.d/docker.repo
-    owner: root
-    group: root
-    mode: 0644
+  - name: "set docker daemon options"
+    template:
+      src: docker.repo.j2
+      dest: /etc/yum.repos.d/docker.repo
+      owner: root
+      group: root
+      mode: 0644
 
-- name: "create systemd drop-in directory"
-  file:
-    state: directory
-    path: "{{ docker_systemd_dir }}"
-    owner: root
-    group: root
-    mode: 0755
+  - name: "create systemd drop-in directory"
+    file:
+      state: directory
+      path: "{{ docker_systemd_dir }}"
+      owner: root
+      group: root
+      mode: 0755
+  when: ansible_distribution == 'CentOS'
 
+- block:
+  - name: Add repository
+    yum_repository:
+    name: docker
+    enabled: no
+  # - name: "set docker daemon Repo"
+  #   template:
+  #     src: docker.repo.j2
+  #     dest: /etc/yum.repos.d/docker.repo
+  #     owner: root
+  #     group: root
+  #     mode: 0644
+
+  - name: "create systemd drop-in directory"
+    file:
+      state: directory
+      path: "{{ docker_systemd_dir }}"
+      owner: root
+      group: root
+      mode: 0755
+  when: ansible_distribution == 'Red Hat Enterprise Linux'
+  
 - block:
 
   - name: "configure proxy for docker service"
@@ -43,7 +67,3 @@
     when: service_is_installed == "installed"
 
   when: docker_use_proxy
-
-
-
-
