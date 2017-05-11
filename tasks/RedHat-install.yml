@@ -13,20 +13,13 @@
       group: root
       mode: 0644
 
-  - name: "create systemd drop-in directory"
-    file:
-      state: directory
-      path: "{{ docker_systemd_dir }}"
-      owner: root
-      group: root
-      mode: 0755
   when: ansible_distribution == 'CentOS'
 
 - block:
-  - name: Add repository
+  - name: Disable docker Repository
     yum_repository:
-    name: docker
-    enabled: no
+      name: docker
+      enabled: no
   # - name: "set docker daemon Repo"
   #   template:
   #     src: docker.repo.j2
@@ -34,15 +27,15 @@
   #     owner: root
   #     group: root
   #     mode: 0644
-
-  - name: "create systemd drop-in directory"
-    file:
-      state: directory
-      path: "{{ docker_systemd_dir }}"
-      owner: root
-      group: root
-      mode: 0755
   when: ansible_distribution == 'Red Hat Enterprise Linux'
+  
+- name: "create systemd drop-in directory"
+  file:
+    state: directory
+    path: "{{ docker_systemd_dir }}"
+    owner: root
+    group: root
+    mode: 0755
   
 - block:
 
