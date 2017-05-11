@@ -7,13 +7,15 @@
 - name: "Include {{ ansible_os_family }} requirements"
   include: "{{ ansible_os_family }}-install.yml"
 
+# Relevant only for CentOS
 - name: "Install docker + reqs"
   package:
     name: "{{ item }}"
     state: latest
   with_items:
-    - docker-engine
-    - python-pip
+    - docker-engine-selinux.noarch-1.13.1-1.el7.centos
+    - docker-engine.x86_64-1.13.1-1.el7.centos
+    - python2-pip.noarch-8.1.2-5.el7  
   register: result
   until: '"failed" not in result'
   retries: 5
